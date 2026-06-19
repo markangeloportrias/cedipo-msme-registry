@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CEDIPO Admin</title>
+    <!-- Auth guard: redirect to login if not authenticated -->
+    <script>
+      if (localStorage.getItem("is_admin") !== "true") {
+        window.location.replace("login.html");
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -210,62 +216,6 @@
         }
       }
 
-      /* Responsive adjustments for selection tool and page layout */
-      @media (max-width: 768px) {
-        .fixed-selection-tools {
-          bottom: 1rem;
-          right: 1rem;
-          width: 200px;
-          padding: 1rem;
-        }
-      }
-      @media (max-width: 640px) {
-        .fixed-selection-tools {
-          bottom: 0;
-          right: 0;
-          width: 100%;
-          border-radius: 16px 16px 0 0;
-          border-left: none;
-          border-right: none;
-          border-bottom: none;
-          padding: 1rem;
-          flex-direction: row;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 0.5rem 1rem;
-        }
-        .fixed-selection-tools > span {
-          width: 100%;
-          text-align: center;
-          margin-bottom: 0 !important;
-        }
-        .fixed-selection-tools > div {
-          width: 100%;
-          margin-top: 4px !important;
-          padding-top: 8px !important;
-        }
-        .radio-tool {
-          font-size: 0.8rem;
-        }
-        
-        /* Adjust page to not be covered by the selection tool */
-        .page {
-          padding-bottom: 140px; 
-        }
-        
-        /* Make header text smaller on mobile */
-        .site-header h1 {
-          font-size: 1.25rem !important;
-        }
-        .site-header p {
-          font-size: 0.75rem !important;
-        }
-        .site-header .logo {
-          width: 50px !important;
-          height: 50px !important;
-        }
-      }
-
       /* PRINT STYLES */
       @media print {
         @page {
@@ -427,7 +377,7 @@
       <main class="main">
         <div class="admin-layout">
           <!-- SIDEBAR -->
-          <aside class="admin-sidebar" id="admin-sidebar">
+          <aside class="admin-sidebar">
             <div class="sidebar-card">
               <span class="sidebar-title" id="passkey-form-title"
                 >Create Passkey</span
@@ -471,7 +421,7 @@
           </aside>
 
           <!-- CONTENT AREA -->
-          <div class="admin-content" id="admin-content-area">
+          <div class="admin-content">
             <!-- TOOLBAR -->
             <div class="toolbar">
               <div class="search-wrap">

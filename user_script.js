@@ -34,7 +34,6 @@ async function loadUserData() {
   const loader = document.getElementById("loader");
   const passkey = localStorage.getItem("user_passkey");
   if (!passkey) return (window.location.href = "admin/login.html");
-
   try {
     const { data: pkData } = await window.supabase
       .from("passkeys")
@@ -43,24 +42,45 @@ async function loadUserData() {
       .single();
     if (!pkData) throw new Error("Invalid passkey");
 
-    const { data: items } = await window.supabase
-      .from("passkey_items")
-      .select("business_number")
-      .eq("passkey_id", pkData.id);
+    // Fetch all passkey_items using pagination (range) to bypass 1000 limit
+    let items = [];
+    let from = 0;
+    const batchSize = 1000;
+    while (true) {
+      const { data: batch, error } = await window.supabase
+        .from("passkey_items")
+        .select("business_number")
+        .eq("passkey_id", pkData.id)
+        .range(from, from + batchSize - 1);
+      if (error) throw error;
+      if (!batch || batch.length === 0) break;
+      items = items.concat(batch);
+      if (batch.length < batchSize) break;
+      from += batchSize;
+    }
     const bizNumbers = items.map((it) => String(it.business_number));
 
-    if (bizNumbers.length > 0) {
-      const { data: rawData } = await window.supabase
+    // Fetch businesses in batches of 1000 using .in
+    allBusinesses = [];
+    const batchSizeBiz = 1000;
+    for (let i = 0; i < bizNumbers.length; i += batchSizeBiz) {
+      const slice = bizNumbers.slice(i, i + batchSizeBiz);
+      const { data: rawData, error } = await window.supabase
         .from("businesses")
         .select("*")
-        .in("number", bizNumbers);
-      allBusinesses = rawData.map((b) => ({
-        number: String(b.number),
-        name: b.business_name,
-        location: b.location,
-        owner: b.owner,
-        type: b.line_of_business,
-      }));
+        .in("number", slice);
+      if (error) throw error;
+      if (rawData) {
+        allBusinesses = allBusinesses.concat(
+          rawData.map((b) => ({
+            number: String(b.number),
+            name: b.business_name,
+            location: b.location,
+            owner: b.owner,
+            type: b.line_of_business,
+          }))
+        );
+      }
     }
     applyFilters();
     renderRegistry();
@@ -69,6 +89,8 @@ async function loadUserData() {
   } finally {
     if (loader) loader.style.display = "none";
   }
+}
+// Duplicate loadUserData removed
 }
 
 function applyFilters() {
