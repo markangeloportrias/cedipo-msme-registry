@@ -191,18 +191,6 @@ function updateStats() {
     selectedIds.size.toLocaleString();
 }
 
-function goToPage(pageNum, totalPages) {
-  if (pageNum < 1 || pageNum > totalPages || isNaN(pageNum)) {
-    showToast(
-      `Please enter a page number between 1 and ${totalPages}`,
-      "error",
-    );
-    return;
-  }
-  currentPage = pageNum;
-  renderRegistry();
-}
-
 function toggleSelection(id) {
   if (selectedIds.has(id)) selectedIds.delete(id);
   else selectedIds.add(id);

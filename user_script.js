@@ -286,54 +286,39 @@ function renderPagination(totalItems) {
   backBtn.textContent = "← Back";
   backBtn.className = "page-btn";
   backBtn.disabled = currentPage === 1;
-  backBtn.onclick = (e) => {
-    e.stopPropagation();
+  backBtn.onclick = () => {
     currentPage--;
     renderRegistry();
   };
   pagination.appendChild(backBtn);
 
-  // Go To page section
-  const goToContainer = document.createElement("div");
-  goToContainer.style.cssText =
-    "display: flex; align-items: center; gap: 8px; margin: 0 10px;";
+  const info = document.createElement("span");
+  info.className = "page-info";
+  info.textContent = `Page ${currentPage} of ${totalPages}`;
+  pagination.appendChild(info);
 
-  const goToLabel = document.createElement("span");
-  goToLabel.textContent = "Go to:";
-  goToLabel.style.cssText =
-    "font-size: 0.875rem; color: var(--text-secondary);";
-  goToContainer.appendChild(goToLabel);
-
-  const goToInput = document.createElement("input");
-  goToInput.type = "number";
-  goToInput.min = "1";
-  goToInput.max = totalPages;
-  goToInput.value = currentPage;
-  goToInput.style.cssText =
-    "width: 50px; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.875rem;";
-  goToContainer.appendChild(goToInput);
-
-  const pageCount = document.createElement("span");
-  pageCount.textContent = `of ${totalPages}`;
-  pageCount.style.cssText =
-    "font-size: 0.875rem; color: var(--text-secondary);";
-  goToContainer.appendChild(pageCount);
-
-  const goBtn = document.createElement("button");
-  goBtn.textContent = "Go";
-  goBtn.style.cssText =
-    "padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border); background: white; cursor: pointer; font-size: 0.875rem;";
-  goBtn.onclick = () => goToPage(parseInt(goToInput.value), totalPages);
-  goToContainer.appendChild(goBtn);
-
-  pagination.appendChild(goToContainer);
+  const input = document.createElement("input");
+  input.type = "number";
+  input.min = 1;
+  input.max = totalPages;
+  input.placeholder = "Go to…";
+  input.className = "page-input";
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+      const p = parseInt(input.value);
+      if (p >= 1 && p <= totalPages) {
+        currentPage = p;
+        renderRegistry();
+      }
+    }
+  });
+  pagination.appendChild(input);
 
   const nextBtn = document.createElement("button");
   nextBtn.textContent = "Next →";
   nextBtn.className = "page-btn";
   nextBtn.disabled = currentPage === totalPages;
-  nextBtn.onclick = (e) => {
-    e.stopPropagation();
+  nextBtn.onclick = () => {
     currentPage++;
     renderRegistry();
   };
@@ -346,26 +331,11 @@ function renderPagination(totalItems) {
   });
 }
 
-function goToPage(pageNum, totalPages) {
-  if (pageNum < 1 || pageNum > totalPages || isNaN(pageNum)) {
-    showToast(
-      `Please enter a page number between 1 and ${totalPages}`,
-      "error",
-    );
-    return;
-  }
-  currentPage = pageNum;
-  renderRegistry();
-}
-
 function logout() {
-  showMessageOption(
-    "Are you sure you want to logout?",
-    () => {
-      localStorage.removeItem("user_passkey");
-      window.location.href = "admin/login.html";
-    }
-  );
+  showMessageOption("Are you sure you want to logout?", () => {
+    localStorage.removeItem("user_passkey");
+    window.location.href = "admin/login.html";
+  });
 }
 function openModal(id) {
   document.getElementById(id).classList.add("flex");
@@ -413,16 +383,19 @@ function showMessageOption(message, onConfirm, onCancel) {
 
   const title = document.createElement("h2");
   title.textContent = "Confirm";
-  title.style.cssText = "margin: 0 0 12px 0; font-size: 18px; color: var(--text-primary);";
+  title.style.cssText =
+    "margin: 0 0 12px 0; font-size: 18px; color: var(--text-primary);";
   modal.appendChild(title);
 
   const msg = document.createElement("p");
   msg.textContent = message;
-  msg.style.cssText = "margin: 0 0 24px 0; font-size: 14px; color: var(--text-secondary); line-height: 1.5;";
+  msg.style.cssText =
+    "margin: 0 0 24px 0; font-size: 14px; color: var(--text-secondary); line-height: 1.5;";
   modal.appendChild(msg);
 
   const btnContainer = document.createElement("div");
-  btnContainer.style.cssText = "display: flex; gap: 12px; justify-content: center;";
+  btnContainer.style.cssText =
+    "display: flex; gap: 12px; justify-content: center;";
 
   const cancelBtn = document.createElement("button");
   cancelBtn.textContent = "Cancel";
