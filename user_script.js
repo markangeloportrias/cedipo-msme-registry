@@ -78,7 +78,7 @@ async function loadUserData() {
             location: b.location,
             owner: b.owner,
             type: b.line_of_business,
-          }))
+          })),
         );
       }
     }
@@ -89,8 +89,6 @@ async function loadUserData() {
   } finally {
     if (loader) loader.style.display = "none";
   }
-}
-// Duplicate loadUserData removed
 }
 
 function applyFilters() {
