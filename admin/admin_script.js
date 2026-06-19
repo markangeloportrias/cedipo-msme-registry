@@ -434,18 +434,33 @@ async function editPasskey(id) {
 
   editingPasskeyId = id;
 
-  // Load businesses for this passkey into the selection tool
-  const { data, error } = await window.supabase
-    .from("passkey_items")
-    .select("business_number")
-    .eq("passkey_id", id);
+  // Load all businesses for this passkey using pagination to bypass 1000 row limit
+  let items = [];
+  let from = 0;
+  const batchSize = 1000;
+  try {
+    while (true) {
+      const { data: batch, error } = await window.supabase
+        .from("passkey_items")
+        .select("business_number")
+        .eq("passkey_id", id)
+        .range(from, from + batchSize - 1);
 
-  if (!error && data) {
+      if (error) throw error;
+      if (!batch || batch.length === 0) break;
+      items = items.concat(batch);
+      if (batch.length < batchSize) break;
+      from += batchSize;
+    }
+
     selectedIds.clear();
-    data.forEach((item) => selectedIds.add(String(item.business_number)));
+    items.forEach((item) => selectedIds.add(String(item.business_number)));
     renderRegistry();
     updateStats();
+  } catch (err) {
+    showToast("Error loading passkey businesses", "error");
   }
+
   renderSavedPasskeys(); // Update button text in the list
   document.getElementById("passkey-form-title").textContent = "Edit Passkey";
   document.getElementById("passkey-name-input").value = pk.name;
