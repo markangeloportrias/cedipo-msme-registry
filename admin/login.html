@@ -255,13 +255,23 @@
           </div>
           <div class="form-group">
             <label for="admin-password">Password</label>
-            <input
-              type="password"
-              id="admin-password"
-              name="password"
-              placeholder="Enter password"
-              required
-            />
+            <div class="passkey-container">
+              <input
+                type="password"
+                id="admin-password"
+                name="password"
+                placeholder="Enter password"
+                style="padding-right: 40px"
+                required
+              />
+              <button
+                type="button"
+                class="passkey-toggle"
+                onclick="toggleAdminPassword()"
+              >
+                <i id="toggleAdminIcon" class="ti ti-eye"></i>
+              </button>
+            </div>
           </div>
           <button type="submit">Login to Admin</button>
         </form>
@@ -276,6 +286,18 @@
       function togglePasskey() {
         const input = document.getElementById("passkey");
         const icon = document.getElementById("toggleIcon");
+        if (input.type === "password") {
+          input.type = "text";
+          icon.classList.replace("ti-eye", "ti-eye-off");
+        } else {
+          input.type = "password";
+          icon.classList.replace("ti-eye-off", "ti-eye");
+        }
+      }
+
+      function toggleAdminPassword() {
+        const input = document.getElementById("admin-password");
+        const icon = document.getElementById("toggleAdminIcon");
         if (input.type === "password") {
           input.type = "text";
           icon.classList.replace("ti-eye", "ti-eye-off");
