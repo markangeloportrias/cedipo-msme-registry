@@ -210,9 +210,6 @@
       <!-- USER TAB -->
       <div id="user-tab" class="tab-content active">
         <div class="error" id="user-error"></div>
-        <div class="info">
-          Enter your passkey to access the business registry.
-        </div>
         <form id="userForm">
           <div class="form-group">
             <label for="passkey">Passkey</label>
@@ -241,7 +238,6 @@
       <!-- ADMIN TAB -->
       <div id="admin-tab" class="tab-content">
         <div class="error" id="admin-error"></div>
-        <div class="info">Admin login to manage passkeys.</div>
         <form id="adminForm">
           <div class="form-group">
             <label for="admin-username">Username</label>
@@ -283,6 +279,45 @@
     <!-- Load Supabase client initialization -->
     <script src="../supabaseClient.js"></script>
     <script>
+      function showMessageDialog(message, title = "Error") {
+        const backdrop = document.createElement("div");
+        backdrop.style.cssText =
+          "position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;";
+
+        const modal = document.createElement("div");
+        modal.style.cssText =
+          "background: white; border-radius: 12px; padding: 24px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); max-width: 400px; text-align: center;";
+
+        const titleEl = document.createElement("h2");
+        titleEl.textContent = title;
+        titleEl.style.cssText =
+          "margin: 0 0 12px 0; font-size: 18px; color: #dc2626;";
+        modal.appendChild(titleEl);
+
+        const msg = document.createElement("p");
+        msg.textContent = message;
+        msg.style.cssText =
+          "margin: 0 0 24px 0; font-size: 14px; color: #666; line-height: 1.5;";
+        modal.appendChild(msg);
+
+        const btnContainer = document.createElement("div");
+        btnContainer.style.cssText =
+          "display: flex; gap: 12px; justify-content: center;";
+
+        const okBtn = document.createElement("button");
+        okBtn.textContent = "OK";
+        okBtn.style.cssText =
+          "padding: 8px 20px; border-radius: 6px; border: none; background: #4caf50; color: white; cursor: pointer; font-size: 14px; font-weight: 600;";
+        okBtn.onclick = () => {
+          backdrop.remove();
+        };
+        btnContainer.appendChild(okBtn);
+
+        modal.appendChild(btnContainer);
+        backdrop.appendChild(modal);
+        document.body.appendChild(backdrop);
+      }
+
       function togglePasskey() {
         const input = document.getElementById("passkey");
         const icon = document.getElementById("toggleIcon");
@@ -325,9 +360,6 @@
         .addEventListener("submit", async function (e) {
           e.preventDefault();
           const passkey = document.getElementById("passkey").value;
-          const errorDiv = document.getElementById("user-error"); // Assuming this exists
-          errorDiv.classList.remove("show");
-          errorDiv.textContent = "";
 
           const { data, error } = await supabase
             .from("passkeys")
@@ -339,8 +371,10 @@
             localStorage.setItem("user_passkey", passkey);
             window.location.href = "../user.html";
           } else {
-            errorDiv.textContent = "Invalid passkey";
-            errorDiv.classList.add("show");
+            showMessageDialog(
+              "Invalid passkey. Please try again.",
+              "Login Failed",
+            );
           }
         });
 
@@ -351,15 +385,13 @@
           e.preventDefault();
           const username = document.getElementById("admin-username").value;
           const password = document.getElementById("admin-password").value;
-          const errorDiv = document.getElementById("admin-error");
 
           if (username === "cedipotagbilaran" && password === "cedipo2026") {
             localStorage.setItem("is_admin", "true");
             localStorage.setItem("admin_user", username);
             window.location.href = "admin.html";
           } else {
-            errorDiv.textContent = "Invalid credentials";
-            errorDiv.classList.add("show");
+            showMessageDialog("Invalid username or password. Please try again.", "Login Failed");
           }
         });
 
