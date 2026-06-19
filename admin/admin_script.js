@@ -260,7 +260,7 @@ async function savePasskey() {
     }
 
     const actionType = id ? "updated" : "saved";
-    showMessageOption(
+    showSuccessDialog(
       `Passkey "${name}" has been ${actionType} successfully with ${items.length} business(es).`,
       () => {
         cancelEditPasskey(); // Reset form after save/update
@@ -831,6 +831,46 @@ function showMessageOption(message, onConfirm, onCancel) {
   document.body.appendChild(backdrop);
 }
 
+function showSuccessDialog(message, onOk) {
+  const backdrop = document.createElement("div");
+  backdrop.style.cssText =
+    "position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;";
+
+  const modal = document.createElement("div");
+  modal.style.cssText =
+    "background: white; border-radius: 12px; padding: 24px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); max-width: 400px; text-align: center;";
+
+  const title = document.createElement("h2");
+  title.textContent = "Success";
+  title.style.cssText =
+    "margin: 0 0 12px 0; font-size: 18px; color: var(--text-primary);";
+  modal.appendChild(title);
+
+  const msg = document.createElement("p");
+  msg.textContent = message;
+  msg.style.cssText =
+    "margin: 0 0 24px 0; font-size: 14px; color: var(--text-secondary); line-height: 1.5;";
+  modal.appendChild(msg);
+
+  const btnContainer = document.createElement("div");
+  btnContainer.style.cssText =
+    "display: flex; gap: 12px; justify-content: center;";
+
+  const okBtn = document.createElement("button");
+  okBtn.textContent = "OK";
+  okBtn.style.cssText =
+    "padding: 8px 20px; border-radius: 6px; border: none; background: #2d7a4f; color: white; cursor: pointer; font-size: 14px; font-weight: 600;";
+  okBtn.onclick = () => {
+    backdrop.remove();
+    if (onOk) onOk();
+  };
+  btnContainer.appendChild(okBtn);
+
+  modal.appendChild(btnContainer);
+  backdrop.appendChild(modal);
+  document.body.appendChild(backdrop);
+}
+
 function showAlert(msg) {
   const messageEl = document.getElementById("alert-message");
   if (messageEl) messageEl.textContent = msg;
@@ -876,6 +916,7 @@ window.logout = logout; // Keep logout
 window.openModal = openModal; // Keep openModal
 window.closeModal = closeModal; // Keep closeModal
 window.showMessageOption = showMessageOption; // Keep showMessageOption
+window.showSuccessDialog = showSuccessDialog; // Keep showSuccessDialog
 window.deletePasskey = deletePasskey;
 window.closeDeletePasskeyModal = closeDeletePasskeyModal;
 window.confirmDeletePasskey = confirmDeletePasskey;
