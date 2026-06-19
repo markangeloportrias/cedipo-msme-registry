@@ -293,6 +293,41 @@ function renderPagination(totalItems) {
   };
   pagination.appendChild(backBtn);
 
+  // Go To page section
+  const goToContainer = document.createElement("div");
+  goToContainer.style.cssText =
+    "display: flex; align-items: center; gap: 8px; margin: 0 10px;";
+
+  const goToLabel = document.createElement("span");
+  goToLabel.textContent = "Go to:";
+  goToLabel.style.cssText =
+    "font-size: 0.875rem; color: var(--text-secondary);";
+  goToContainer.appendChild(goToLabel);
+
+  const goToInput = document.createElement("input");
+  goToInput.type = "number";
+  goToInput.min = "1";
+  goToInput.max = totalPages;
+  goToInput.value = currentPage;
+  goToInput.style.cssText =
+    "width: 50px; padding: 6px 8px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.875rem;";
+  goToContainer.appendChild(goToInput);
+
+  const pageCount = document.createElement("span");
+  pageCount.textContent = `of ${totalPages}`;
+  pageCount.style.cssText =
+    "font-size: 0.875rem; color: var(--text-secondary);";
+  goToContainer.appendChild(pageCount);
+
+  const goBtn = document.createElement("button");
+  goBtn.textContent = "Go";
+  goBtn.style.cssText =
+    "padding: 6px 12px; border-radius: 4px; border: 1px solid var(--border); background: white; cursor: pointer; font-size: 0.875rem;";
+  goBtn.onclick = () => goToPage(parseInt(goToInput.value), totalPages);
+  goToContainer.appendChild(goBtn);
+
+  pagination.appendChild(goToContainer);
+
   const nextBtn = document.createElement("button");
   nextBtn.textContent = "Next →";
   nextBtn.className = "page-btn";
@@ -309,6 +344,18 @@ function renderPagination(totalItems) {
       "padding: 8px 16px; margin: 0 5px; border-radius: 6px; border: 1px solid var(--border); background: white; cursor: pointer;";
     if (btn.disabled) btn.style.opacity = "0.5";
   });
+}
+
+function goToPage(pageNum, totalPages) {
+  if (pageNum < 1 || pageNum > totalPages || isNaN(pageNum)) {
+    showToast(
+      `Please enter a page number between 1 and ${totalPages}`,
+      "error",
+    );
+    return;
+  }
+  currentPage = pageNum;
+  renderRegistry();
 }
 
 function logout() {
